@@ -1,34 +1,38 @@
-Python script to update DNS A record of your domain dynamically using gandi.net LiveDNS API:
+Gandi-ddns est un script Python pour faciliter la mise à jour des enregistrement DNS avec l'application gandi.net LiveDNS.
 
-http://doc.livedns.gandi.net/
+Cet outil est particulièrement utile pour les utilisateur auto-hébergeant leurs serveurs à la maison et ne disposant pas d'une adresse IP fixe, mais possédant un nom de domaine chez Gandi.net.
 
-The script was developed for those behind a dynamic IP interface (e.g. home server/pi/nas).
+Pour information, vous trouverez diverses informations complémentaires sur LiveDNS ici : http://doc.livedns.gandi.net/
 
-The config-template.txt file should be renamed to config.txt, and modified with your gandi.net API key, domain name, and A-record (@, dev, home, pi, etc).
+Enfin, notez que ce script est un fork de l'excellent travail suivant : https://github.com/rmarchant/gandi-ddns
 
-Every time the script runs, it will query an external service to retrieve the external IP of the machine, compare it to the current A record in the zone at gandi.net, and then update the record if the IP has changed.
-
-Requirements: 
-
-  pip install -r requirements.txt
-
-You can then run the script as a cron job :
-
+Installation sur Debian 10.7.1 (testé et validé dans un container non privilégié Proxmox) :
+- après installation d'une Debian 10, veuillez réaliser les mises à jour si cela s'avère nécessaire :
 ```
-*/15 * * * * python /home/user/gandi_ddns.py
+~# apt update
+~# apt upgrade
 ```
+- l'utilisation de Python3.7 est recommandée, il faut donc l'installer
+```
+~# apt install python3.7
+```
+- télécharger ensuite le zip (master.zip) dans /home/"user"
+```
+~# wget <url du master.zip de ce dépôt>
+```
+/!\ Il vous faudra ensuite récupérer votre API key sur le site gandi.net (dans l'ongle "sécurité" de votre interface d'administration ;-) )
 
-But to be nice to the API servers, you should choose a random offset for your job. For example to run at 2 minutes after the hour, and then every 15 minutes :
+- la clé devra ensuite être renseigner dans les fichiers *.txt (tout comme les types/noms des enregistraments au sein de ces mêmes fichiers).
+- Indispensable : pensez à vérifier que tout est bien installé (dans mon cas, je n'avais rien eu à faire, mais un contrôle des dépendances est conseillé via la commande suivante : 
+```
+~# pip3 install -r requirements.txt
+```
+/!\ si la commande "pip3" ne fonctionne pas, c'est qu'il faut tout simplement installer python-pip3 ;-)
+
+- Enfin il ne reste plus qu'à rédiger les tâches cron nécessaire pour l'actualisation. Tout comme l'auteur initial du script d'origine, je vous recommande d'utiliser la récurrence suivante :
 
 ```
 2-59/15 * * * * python /home/user/gandi-ddns.py
 ```
-
-macOS
-
-```
-cd gandi-ddns
-ln -s $(pwd) /usr/local/gandi-ddns
-sudo cp gandi.ddns.plist /Library/LaunchDaemons/
-sudo launchctl /Library/LaunchDaemons/gandi.ddns.plist
-```
+Et voilà, un reboot (au cas où) et tout devrait fonctionner sans souci !
+Sangokuss.
